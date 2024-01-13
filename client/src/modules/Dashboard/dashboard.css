@@ -1,0 +1,195 @@
+.boshboard.main {
+    background: #f1f1f1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.boshboard.main .part1 {
+    background: #f1f1f1;
+    width: 25%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.boshboard.main .part1::-webkit-scrollbar {
+    display: none;
+}
+
+.boshboard.main .part2 {
+    background: #dae1fc;
+    width: 50%;
+    height: 100%;
+}
+
+.boshboard.main .part3 {
+    background: #f1f1f1;
+    width: 25%;
+    height: 100%;
+}
+
+.my-mini-profile-section {
+    display: flex;
+    margin-top: 3%;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.my-mini-profile-section p {
+    padding: 0;
+    margin: 0;
+}
+
+.image-avtar {
+    border-radius: 50%;
+    border: 2px solid transparent;
+    outline: 3px solid #849cfd;
+    width: 4.7rem;
+    height: 4.7rem;
+}
+
+.contact-section {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-content: center;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+    gap: 1rem;
+
+}
+
+.contact-section .image-avtar {
+    outline: 3px solid #5c6db1;
+    width: 4.5rem;
+    height: 4.5rem;
+}
+
+.contact-section .image-avtar.active {
+    outline: 3px solid rgb(47, 157, 47);
+}
+
+.part2 .resiver-profile {
+    background-color: #849cfd;
+    font-weight: bold;
+    cursor: pointer;
+    width: 80%;
+    height: fit-content;
+    display: flex;
+    padding: 10px;
+    border-radius: 50px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem auto;
+    box-shadow: 1px 0px 20px 0px #3e3e3e46;
+}
+
+.part2 .resiver-profile .user-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.part2 .resiver-profile .user-info .image-avtar {
+    outline: 0;
+    border: 0;
+}
+
+.part2 .resiver-profile .call-section {
+    margin-right: 1rem;
+}
+
+
+
+.part2 .chats-section {
+    height: calc(80vh - 7rem);
+    overflow-y: scroll;
+    /* box-shadow: 0 3px 10px 1px #00000045; */
+    border-bottom: 1px solid rgba(128, 128, 128, 0.199);
+}
+
+.part2 .chats-section::-webkit-scrollbar {
+    display: none;
+}
+
+.part2 .chats-section .chats {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.part2 .chats-section .chats .chat {
+    width: fit-content;
+    max-width: 50%;
+    height: fit-content;
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    border-radius: 10px 5px;
+}
+
+.part2 .chats-section .chats .chat.resiver-chat {
+    background-color: #849cfd;
+    align-self: flex-start;
+}
+
+.part2 .chats-section .chats .chat.sender-chat {
+    background-color: #5c6db1;
+    color: #fff;
+    align-self: flex-end;
+}
+
+.part2 .typeing-input {
+    display: flex;
+    height: 10rem;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 1rem;
+    gap: 10px;
+}
+
+.part2 .typeing-input form {
+    width: 100%;
+}
+
+.part2 .typeing-input form input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0px #00000040;
+}
+
+.part2 .typeing-input button {
+    border: none;
+    outline: none;
+    background-color: #0d6efd;
+    padding: 10px;
+    border-radius: 50%;
+    box-shadow: 1px 4px 8px 1px #000000b0;
+}
+
+
+/* margin and padding 0 */
+.p-m-0 {
+    margin: 0;
+    padding: 0;
+}
