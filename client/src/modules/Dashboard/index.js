@@ -1,8 +1,31 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
+import toast, { Toaster } from 'react-hot-toast';
 import "../Dashboard/dashboard.css"
 import Avtar from "../../images/avtar.jpg"
 
-export default function index() {
+export default function Index() {
+  const notify = () => toast.success('Welcome Back...');
+  const currentUserData = JSON.parse(localStorage.getItem("user:info"));
+  useEffect(() => {
+    notify()
+    const fetchConversations = async () => {
+      const res = await fetch(`http://localhost:5500/api/conversations/${currentUserData.id}`, {
+        // const res = await fetch(`http://localhost:5500/api/conversations/659ef9bb6022c3e5efb4dd4a`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const resData = await res.json();
+
+      setConversations(resData);
+    }
+    fetchConversations();
+  }, []);
+
+  const [conversations, setConversations] = useState([]);
+  console.log(conversations);
+
   const contact = [
     {
       name: 'Sandip',
@@ -65,6 +88,9 @@ export default function index() {
     name: "Rahul",
     status: 'Available'
   }
+
+
+
   return (
     <div className='boshboard main'>
       <div className="part1">
@@ -72,7 +98,7 @@ export default function index() {
         <div className='my-mini-profile-section'>
           <img className='image-avtar' src={Avtar} alt="Loading..." />
           <div>
-            <h3>Dashboard</h3>
+            <h3>{currentUserData.fullName}</h3>
             <p>MyAccount</p>
           </div>
         </div>
@@ -82,20 +108,26 @@ export default function index() {
           <div>&nbsp;&nbsp;&nbsp;Messages </div>
           <div className="contacts">
             {
-              contact.map(({ name, status, img }, index) => {
-                return (
-                  <Fragment key={index}>
-                    <hr />
-                    <div className='contact-section'>
-                      <img className={status === 'Available' ? 'image-avtar active' : 'image-avtar'} src={img} alt="Loading..." />
-                      <div>
-                        <h4 className='p-m-0'>{name}</h4>
-                        <p className='p-m-0'>{status}</p>
+              conversations.length !== 0 ?
+                conversations.map(({ conversation, user }, index) => {
+                  return (
+                    <Fragment key={index}>
+                      <hr />
+                      <div className='contact-section'>
+                        <img className={"status" === 'Available' ? 'image-avtar active' : 'image-avtar'} src={Avtar} alt="Loading..." />
+                        <div>
+                          <h4 className='p-m-0'>{user?.fullName}</h4>
+                          <p className='p-m-0'>{user?.email}</p>
+                        </div>
                       </div>
-                    </div>
-                  </Fragment>
-                )
-              })
+                    </Fragment>
+                  )
+                })
+                : <div className='text-center mt-5'>
+                  <div>Not Found any Conversation</div>
+                  <div>Please Create Conversation</div>
+                </div>
+
             }
           </div>
         </div>
@@ -166,9 +198,27 @@ export default function index() {
         </div>
       </div>
       <div className="part3">
-
+        <h3 className='text-center mt-3'>Contacts</h3>
+        <div className="contacts">
+          {
+            contact.map(({ name, status, img }, index) => {
+              return (
+                <Fragment key={index}>
+                  <hr />
+                  <div className='contact-section'>
+                    <img className={status === 'Available' ? 'image-avtar active' : 'image-avtar'} src={img} alt="Loading..." />
+                    <div>
+                      <h4 className='p-m-0'>{name}</h4>
+                      <p className='p-m-0'>{status}</p>
+                    </div>
+                  </div>
+                </Fragment>
+              )
+            })
+          }
+        </div>
       </div>
-
+      <Toaster position='top-right' />
     </div>
   )
 }

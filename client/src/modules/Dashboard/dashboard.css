@@ -26,6 +26,10 @@
     background: #f1f1f1;
     width: 25%;
     height: 100%;
+    overflow-y: scroll;
+}
+.boshboard.main .part3::-webkit-scrollbar {
+    display: none;
 }
 
 .my-mini-profile-section {

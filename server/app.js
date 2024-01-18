@@ -1,6 +1,7 @@
 const express = require('express');
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
 
 // Connect DB
 require('./db/connection');
@@ -14,6 +15,7 @@ const Messages = require('./models/Messages');
 const app = express();
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 // Routes
 app.get('/', Users, (req, res) => {
@@ -24,31 +26,27 @@ app.post('/api/register', async (req, res, next) => {
     try {
         const { fullName, email, password } = req.body;
         if (!fullName || !email || !password) {
-            // throw new Error("Missing data");
-            return res.status(400).send('Missing fields');
+            return res.status(400).json({ error: 'Missing data', code: 'MISSING_FIELDS' });
         } else {
             // cheach email is already exist
-
-            // const isAlreadyExits = Users.findByEmail(email);
             const isAlreadyExits = await Users.findOne({ email });
             if (isAlreadyExits) {
-                return res.status(400).send('User Already exists');
+                return res.status(400).send({ error: 'User Already exists', code: 'USER_EXISTS' });
             }
             else {
                 const newUser = new Users({ fullName, email });
                 bcryptjs.hash(password, 10, (error, hashPassword) => {
                     if (error) throw error;
-                    // newUser.password = hashPassword;
                     newUser.set('password', hashPassword);
                     newUser.save();
                     next();
                 })
-                res.status(200).send('user Save Successfully');
-
+                res.status(200).json({ message: 'User saved successfully', code: 'USER_SAVED_SUCCESS' });
             }
         }
     } catch (error) {
-        throw new Error(error);
+        return res.status(500).json({ code: 'INTERNAL_ERROR', message: 'Internal server error' });
+        // throw new Error(error);
     }
 })
 
@@ -63,12 +61,12 @@ app.post("/api/login", async (req, res, next) => {
         else {
             const user = await Users.findOne({ email });
             if (!user) {
-                return res.status(400).send('User email and password is incorrect');
+                return res.status(404).json({ code: 'USER_NOT_FOUND', message: 'User not found' });
             }
             else {
                 const validPassord = await bcryptjs.compare(password, user.password);
                 if (!validPassord) {
-                    return res.status(400).send("Invalid Password");
+                    return res.status(401).json({ code: 'INCORRECT_PASSWORD', message: 'Incorrect password' });
                 }
                 else {
                     const payload = {
@@ -84,18 +82,19 @@ app.post("/api/login", async (req, res, next) => {
                         user.save();
                         next();
                     })
-                    res.status(200).json({ user: { email: user.email, fullName: user.fullName }, token: user.token })
+                    return res.status(200).json({ code: 'USER_LOGIN_SUCCESS', message: 'User login successful', token: user.token, user: { id: user._id, fullName: user.fullName, email: user.email } });
                 }
             }
         }
 
     } catch (error) {
-        throw new Error(error);
+        // throw new Error(error);
+        return res.status(500).json({ code: 'INTERNAL_ERROR', message: 'Internal server error' });
     }
 });
 
 // coversations api 
-app.post('/api/conversation', async (req, res) => {
+app.post('/api/conversations', async (req, res) => {
     try {
         const { senderId, receiverId } = req.body;
         const newConversation = new Conversations({ members: [senderId, receiverId] });
@@ -108,7 +107,7 @@ app.post('/api/conversation', async (req, res) => {
 
 
 // get conversation
-app.get("/api/conversation/:userId", async (req, res) => {
+app.get("/api/conversations/:userId", async (req, res) => {
     try {
         const userId = req.params.userId;
         const conversations = await Conversations.find({ members: { $in: [userId] } });
