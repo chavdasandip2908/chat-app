@@ -155,14 +155,14 @@ app.post('/api/message', async (req, res) => {
 app.get('/api/message/:conversationId', async (req, res) => {
     try {
         const conversationId = req.params.conversationId;
-        if (!conversationId) return res.status(200).json([]);
+        if (conversationId === 'new') return res.status(200).json([]);
         const messages = await Messages.find({ conversationId });
         // get messages user data using map
         const messageUserData = Promise.all(messages.map(async (message) => {
             // find sender by id
             const user = await Users.findById(message.senderId);
             // return filter user link return only email, fullName, messages
-            return { user: { fullName: user.fullName, email: user.email }, message: message.message }
+            return { user: { id: user._id, fullName: user.fullName, email: user.email }, message: message.message }
         }));
         res.status(200).json(await messageUserData);
     } catch (error) {

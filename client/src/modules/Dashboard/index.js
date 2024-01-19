@@ -9,8 +9,8 @@ export default function Index() {
   useEffect(() => {
     notify()
     const fetchConversations = async () => {
-      const res = await fetch(`http://localhost:5500/api/conversations/${currentUserData.id}`, {
-        // const res = await fetch(`http://localhost:5500/api/conversations/659ef9bb6022c3e5efb4dd4a`, {
+      // const res = await fetch(`http://localhost:5500/api/conversations/${currentUserData.id}`, {
+      const res = await fetch(`http://localhost:5500/api/conversations/659ef9bb6022c3e5efb4dd4a`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -23,8 +23,22 @@ export default function Index() {
     fetchConversations();
   }, []);
 
+  const fetchMessages = async (conversationId) => {
+    // console.log(conversationId);
+    const msgRes = await fetch(`http://localhost:5500/api/message/${conversationId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    const resData = await msgRes.json();
+    setMessages(resData);
+  }
+
   const [conversations, setConversations] = useState([]);
-  console.log(conversations);
+  const [messages, setMessages] = useState([]);
+  console.log(messages);
+
 
   const contact = [
     {
@@ -113,7 +127,9 @@ export default function Index() {
                   return (
                     <Fragment key={index}>
                       <hr />
-                      <div className='contact-section'>
+                      <div className='contact-section' onClick={() => {
+                        fetchMessages(conversation);
+                      }}>
                         <img className={"status" === 'Available' ? 'image-avtar active' : 'image-avtar'} src={Avtar} alt="Loading..." />
                         <div>
                           <h4 className='p-m-0'>{user?.fullName}</h4>
@@ -153,34 +169,23 @@ export default function Index() {
 
         <div className="chats-section">
           <div className='chats'>
-            <div className="chat resiver-chat">
+            {/* <div className="chat resiver-chat">
               Hello
             </div>
             <div className="chat sender-chat">
               Hello
-            </div>
-            <div className="chat resiver-chat">
-              How are you?
-            </div>
-            <div className="chat resiver-chat">
-              Where are you?
-            </div>
-            <div className="chat sender-chat">
-              I am fine.
-            </div>
-            <div className="chat sender-chat">
-              Ahmedabad.
-            </div>
-            <div className="chat resiver-chat">
-              In which company have you worded?
-            </div>
-            <div className="chat sender-chat">
-              Alight Consultants.
-            </div>
-            <div className="chat resiver-chat">
-              Good.
-            </div>
-
+            </div> */}
+            {
+              messages.length > 0 ?
+                messages.map(({ message, user: { id } = {} }, index) => {
+                  return (
+                    <div key={index} className={id === currentUserData?.id ? "chat sender-chat" : "chat resiver-chat"}>
+                      {message}
+                    </div>
+                  )
+                }) :
+                <div className='text-center'>No Messages</div>
+            }
           </div>
         </div>
 
