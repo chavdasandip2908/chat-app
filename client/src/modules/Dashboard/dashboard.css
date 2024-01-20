@@ -28,6 +28,7 @@
     height: 100%;
     overflow-y: scroll;
 }
+
 .boshboard.main .part3::-webkit-scrollbar {
     display: none;
 }
@@ -156,7 +157,7 @@
     align-self: flex-end;
 }
 
-.part2 .typeing-input {
+.part2 .typeing-input form {
     display: flex;
     height: 10rem;
     flex-direction: row;
@@ -166,11 +167,9 @@
     align-items: center;
     padding: 0 1rem;
     gap: 10px;
-}
-
-.part2 .typeing-input form {
     width: 100%;
 }
+
 
 .part2 .typeing-input form input {
     width: 100%;
