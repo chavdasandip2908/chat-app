@@ -5,6 +5,7 @@ const cors = require("cors");
 const io = require("socket.io")(5501, {
     cors: {
         origin: "http://localhost:3000",
+
     }
 });
 
@@ -76,7 +77,7 @@ app.post('/api/register', async (req, res, next) => {
             // cheach email is already exist
             const isAlreadyExits = await Users.findOne({ email });
             if (isAlreadyExits) {
-                return res.status(400).send({ error: 'User Already exists', code: 'USER_EXISTS' });
+                return res.status(400).send({ error: 'User already exists', code: 'USER_EXISTS' });
             }
             else {
                 const newUser = new Users({ fullName, email });
@@ -144,7 +145,7 @@ app.post('/api/conversations', async (req, res) => {
         const { senderId, receiverId } = req.body;
         const newConversation = new Conversations({ members: [senderId, receiverId] });
         await newConversation.save();
-        res.status(200).send('conversation created successfully');
+        res.status(200).send('Conversation created successfully');
     } catch (error) {
         throw new Error(error);
     }

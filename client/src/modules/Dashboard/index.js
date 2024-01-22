@@ -17,27 +17,25 @@ export default function Index() {
   // console.log(messages);
 
   useEffect(() => {
-    setSocket(io('ws://localhost:5501'))
+    setSocket(io('http://localhost:5501'))
   }, []);
 
   useEffect(() => {
-
-    socket.emit('addUser', currentUserData?.id);
-
-    socket.on('getUsers', users => {
+    console.log(socket?.connected);
+    socket?.emit('addUser', currentUserData?.id);
+    socket?.on('getUsers', users => {
       console.log("users:>>", users);
     });
 
-    socket.on('getMessage', data => {
-      console.log("data:>>", data);
+    socket?.on('getMessage', data => {
+      console.log(data);
       setMessages(prev => ({
         ...prev,
         messages: Array.isArray(prev.messages) ? [...prev.messages, { user: data.user, message: data.message }] : [{ user: data.user, message: data.message }]
       }))
     });
-
-    console.log(socket);
   }, [socket]);
+
 
   useEffect(() => {
     if (messageRef.current) messageRef.current.scrollIntoView({ behavior: "smooth" });
