@@ -14,26 +14,30 @@ export default function Index() {
   const [contact, setContact] = useState([]);
   const [socket, setSocket] = useState(null);
   const messageRef = useRef(null);
-  // console.log(messages);
+  console.log(messages);
 
   useEffect(() => {
-    setSocket(io('http://localhost:5501'))
+    setSocket(io('http://localhost:5501'));
+    return () => {
+      socketInstance.disconnect();
+    };
   }, []);
 
   useEffect(() => {
-    console.log(socket?.connected);
-    socket?.emit('addUser', currentUserData?.id);
-    socket?.on('getUsers', users => {
-      console.log("users:>>", users);
-    });
-
-    socket?.on('getMessage', data => {
-      console.log(data);
-      setMessages(prev => ({
-        ...prev,
-        messages: Array.isArray(prev.messages) ? [...prev.messages, { user: data.user, message: data.message }] : [{ user: data.user, message: data.message }]
-      }))
-    });
+    if (socket) {
+      socket?.emit('addUser', currentUserData?.id);
+      socket?.on('getUsers', users => {
+        console.log("users:>>", users);
+      });
+  
+      socket?.on('getMessage', data => {
+        console.log(data);
+        setMessages(prev => ({
+          ...prev,
+          messages: Array.isArray(prev.messages) ? [...prev.messages, { user: data.user, message: data.message }] : [{ user: data.user, message: data.message }]
+        }))
+      });
+    }
   }, [socket]);
 
 

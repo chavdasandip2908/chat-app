@@ -26,13 +26,13 @@ app.use(cors());
 
 //Socket.io
 let users = [];
-console.log(users);
 io.on('connection', socket => {
     socket.on('addUser', userId => {
         const isUserExist = users.find(user => user.userId === userId);
         if (!isUserExist) {
             const user = { userId, socketId: socket.id }
             users.push(user)
+            // console.log(users);
             io.emit('getUsers', users);
         }
     });
