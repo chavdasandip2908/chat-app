@@ -1,22 +1,51 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import "../Dashboard/dashboard.css"
 import Avtar from "../../images/avtar.jpg"
+import { io } from "socket.io-client"
 
 export default function Index() {
 
 
+  const currentUserData = JSON.parse(localStorage.getItem("user:info"));
   const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState({});
   const [message, setMessage] = useState('');
   const [contact, setContact] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const messageRef = useRef(null);
+  // console.log(messages);
 
-  console.log(contact);
+  useEffect(() => {
+    setSocket(io('ws://localhost:5501'))
+  }, []);
+
+  useEffect(() => {
+
+    socket.emit('addUser', currentUserData?.id);
+
+    socket.on('getUsers', users => {
+      console.log("users:>>", users);
+    });
+
+    socket.on('getMessage', data => {
+      console.log("data:>>", data);
+      setMessages(prev => ({
+        ...prev,
+        messages: Array.isArray(prev.messages) ? [...prev.messages, { user: data.user, message: data.message }] : [{ user: data.user, message: data.message }]
+      }))
+    });
+
+    console.log(socket);
+  }, [socket]);
+
+  useEffect(() => {
+    if (messageRef.current) messageRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [messages?.messages]);
 
   const notify = () => toast.success('Welcome Back...');
-  const currentUserData = JSON.parse(localStorage.getItem("user:info"));
   useEffect(() => {
-    // notify()
+    notify();
     const fetchConversations = async () => {
       const res = await fetch(`http://localhost:5500/api/conversations/${currentUserData?.id}`, {
         method: 'GET',
@@ -60,7 +89,12 @@ export default function Index() {
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    console.log('sendMessage', message, messages?.conversationId, currentUserData?.id, messages?.receiver?.receiverId);
+    socket?.emit('sendMessage', {
+      conversationId: messages?.conversationId,
+      senderId: currentUserData?.id,
+      message,
+      receiverId: messages?.receiver?.receiverId
+    });
     if (!message) return;
     await fetch(`http://localhost:5500/api/message/`, {
       method: 'POST',
@@ -83,7 +117,7 @@ export default function Index() {
     <div className='boshboard main'>
       <div className="part1">
 
-        <div className='my-mini-profile-section'>
+        <div className='my-mini-profile-section cursor-pointer'>
           <img className='image-avtar' src={Avtar} alt="Loading..." />
           <div>
             <h3>{currentUserData.fullName}</h3>
@@ -101,7 +135,7 @@ export default function Index() {
                   return (
                     <Fragment key={index}>
                       <hr />
-                      <div className='contact-section' onClick={() => {
+                      <div className='contact-section cursor-pointer' onClick={() => {
                         fetchMessages(conversation, user);
                       }}>
                         <img className={"status" === 'Available' ? 'image-avtar active' : 'image-avtar'} src={Avtar} alt="Loading..." />
@@ -147,16 +181,18 @@ export default function Index() {
             </div>
           </div>
         }
-
         <div className="chats-section">
           <div className='chats'>
             {
               messages?.messages?.length > 0 ?
                 messages.messages.map(({ message, user: { id } = {} }, index) => {
                   return (
-                    <div key={index} className={id === currentUserData?.id ? "chat sender-chat" : "chat resiver-chat"}>
-                      {message}
-                    </div>
+                    <Fragment key={index}>
+                      <div className={id === currentUserData?.id ? "chat sender-chat" : "chat resiver-chat"}>
+                        {message}
+                      </div>
+                      <div ref={messageRef}></div>
+                    </Fragment>
                   )
                 })
                 :
@@ -164,12 +200,11 @@ export default function Index() {
             }
           </div>
         </div>
-
         {
           messages?.receiver?.fullName &&
           <div className="typeing-input" onSubmit={(e) => { sendMessage(e) }}>
             <form>
-              <input type="text" placeholder='Type a messages' value={message} onChange={(e) => setMessage(e.target.value)} require />
+              <input type="text" placeholder='Type a messages' value={message} onChange={(e) => setMessage(e.target.value)} required={true} />
               <button type='submit' disabled={!message.trim()}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-send" width="30" height="30" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#fff" fill="none" strokeLinecap="round" strokeLinejoin="round">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
